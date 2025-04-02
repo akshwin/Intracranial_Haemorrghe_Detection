@@ -9,7 +9,7 @@ labels ={0:'No ICH',1:'ICH'}
 tuberculosis = {'ICH'}
 
 def processed_img(img_path):
-    img=load_img(img_path,target_size=(224,224,3))
+    img=load_img(img_path,target_size=(128,128,3))
     img=img_to_array(img)
     img=img/255
     img=np.expand_dims(img,[0])
@@ -32,7 +32,7 @@ def run():
     img_file = st.file_uploader("Choose an image",type=['jpg','jpeg','png'])
 
     if img_file is not None :
-        img  = Image.open(img_file).resize((250,250))
+        img  = Image.open(img_file).resize((128,128))
         st.image(img)
         save_image_path = './upload_image/'+img_file.name
         with open(save_image_path,"wb") as f:
