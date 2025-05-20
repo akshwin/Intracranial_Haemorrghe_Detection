@@ -1,48 +1,79 @@
 import streamlit as st 
 from PIL import Image
-from tensorflow.keras.utils import load_img,img_to_array
+from tensorflow.keras.utils import load_img, img_to_array
 import numpy as np 
 from keras.models import load_model 
+import os
 
-model = load_model ("ich.h5")
-labels ={0:'No ICH',1:'ICH'}
+# Load trained model
+model = load_model("ich.h5", compile=False)
+
+# Label map
+labels = {0: 'No ICH', 1: 'ICH'}
 tuberculosis = {'ICH'}
 
+# Prediction function
 def processed_img(img_path):
-    img=load_img(img_path,target_size=(128,128,3))
-    img=img_to_array(img)
-    img=img/255
-    img=np.expand_dims(img,[0])
-    answer=model.predict(img)
-    y_class = answer.argmax(axis=-1)
-    y = " ".join(str(x) for x in y_class)
-    y = int(y)
-    res = labels[y]
-    return res.capitalize()
+    img = load_img(img_path, target_size=(128, 128, 3))
+    img = img_to_array(img) / 255.0
+    img = np.expand_dims(img, axis=0)
+    prediction = model.predict(img)[0]
+    y_class = np.argmax(prediction)
+    res = labels[y_class]
+    confidence = prediction[y_class]
+    return res.capitalize(), confidence
 
+# Streamlit UI
 def run():
-    st.title("Intracranial Hemorrhage Detection 🧠")
+    st.set_page_config(page_title="ICH Detection", layout="centered")
+    st.title("🧠 Intracranial Hemorrhage Detection")
     st.subheader("Upload the MRI Image:")
 
-    st.sidebar.header("About the project:")
-    st.sidebar.write("📌 The project is developed using a Convolutional Neural Network with an Attention mechanism.")
-    st.sidebar.write("📌 The model detects whether the patient has Intracranial Hemorrhage or not.")
-    st.sidebar.write("📌 The model achieved an accuracy of 92 percent.")
-    
-    img_file = st.file_uploader("Choose an image",type=['jpg','jpeg','png'])
+    # Sidebar Info
+    st.sidebar.header("About the Project 🧾")
+    st.sidebar.markdown("📌 Uses CNN + Attention mechanism")
+    st.sidebar.markdown("📌 Predicts whether ICH is present or not")
+    st.sidebar.markdown("📌 Accuracy: **92%**")
 
-    if img_file is not None :
-        img  = Image.open(img_file).resize((128,128))
-        st.image(img)
-        save_image_path = './upload_image/'+img_file.name
-        with open(save_image_path,"wb") as f:
+    # Dropdowns
+    display_mode = st.sidebar.selectbox("🔍 Display Mode", ["Basic", "Detailed"])
+    show_confidence = st.sidebar.selectbox("📈 Show Confidence Score?", ["Yes", "No"])
+
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("👨‍💻 Developed by Akshwin T")
+    st.sidebar.markdown("📬 Contact: [akshwint.2003@gmail.com](mailto:akshwint.2003@gmail.com)")
+
+    # File upload
+    img_file = st.file_uploader("📤 Upload an MRI Image", type=['jpg', 'jpeg', 'png'])
+
+    if img_file is not None:
+        upload_dir = "./upload_image"
+        os.makedirs(upload_dir, exist_ok=True)
+        save_path = os.path.join(upload_dir, img_file.name)
+
+        with open(save_path, "wb") as f:
             f.write(img_file.getbuffer())
 
-        if img_file is not None :
-                result = processed_img(save_image_path)
-                if result in tuberculosis :
-                    st.error('**ICH DETECTED!!**')
-                else :
-                    st.success('**NO ICH!!**')
-run()
+        # Show image
+        st.image(Image.open(save_path), caption='🖼 Uploaded Image', use_column_width=True)
 
+        # Predict
+        result, confidence = processed_img(save_path)
+        if result in tuberculosis:
+            st.error("🚨 **ICH DETECTED!**")
+        else:
+            st.success("✅ **No ICH Detected.**")
+
+        # Optional confidence display
+        if show_confidence == "Yes":
+            st.markdown(f"**Confidence**: `{confidence * 100:.2f}%`")
+
+        # Optional detailed info
+        if display_mode == "Detailed":
+            st.markdown("📚 *Model: Custom CNN with Attention*")
+            st.markdown("🧪 *Input shape: (128, 128, 3)*")
+            st.markdown("📊 *Model trained on annotated ICH dataset*")
+
+# Run the app
+if __name__ == "__main__":
+    run()
