@@ -10,9 +10,9 @@ model = load_model("ich.h5", compile=False)
 
 # Label map
 labels = {0: 'No ICH', 1: 'ICH'}
-tuberculosis = {'ICH'}
+positive_class = {'ICH'}
 
-# Prediction function
+# Predict function
 def processed_img(img_path):
     img = load_img(img_path, target_size=(128, 128, 3))
     img = img_to_array(img) / 255.0
@@ -23,57 +23,64 @@ def processed_img(img_path):
     confidence = prediction[y_class]
     return res.capitalize(), confidence
 
-# Streamlit UI
+# Streamlit App
 def run():
     st.set_page_config(page_title="ICH Detection", layout="centered")
-    st.title("🧠 Intracranial Hemorrhage Detection")
-    st.subheader("Upload the MRI Image:")
 
-    # Sidebar Info
-    st.sidebar.header("About the Project 🧾")
-    st.sidebar.markdown("📌 Uses CNN + Attention mechanism")
-    st.sidebar.markdown("📌 Predicts whether ICH is present or not")
-    st.sidebar.markdown("📌 Accuracy: **92%**")
+    # === Sidebar ===
+    with st.sidebar:
+        st.markdown("## 🧾 **Project Overview**")
+        st.markdown("""
+        - 🤖 **Model**: CNN with Attention  
+        - 🧠 **Task**: Intracranial Hemorrhage Detection  
+        - 🎯 **Accuracy**: 92%  
+        - 📚 **Input**: MRI Scan Image
+        """)
+        display_mode = st.selectbox("🔍 Display Mode", ["Basic", "Detailed"])
+        show_confidence = st.selectbox("📈 Show Confidence Score?", ["Yes", "No"])
 
-    # Dropdowns
-    display_mode = st.sidebar.selectbox("🔍 Display Mode", ["Basic", "Detailed"])
-    show_confidence = st.sidebar.selectbox("📈 Show Confidence Score?", ["Yes", "No"])
+        st.markdown("---")
+        st.markdown("👨‍💻 **Developed by:** Akshwin T")
+        st.markdown("📬 [akshwint.2003@gmail.com](mailto:akshwint.2003@gmail.com)")
 
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("👨‍💻 Developed by Akshwin T")
-    st.sidebar.markdown("📬 Contact: [akshwint.2003@gmail.com](mailto:akshwint.2003@gmail.com)")
+    # === Main Title ===
+    st.markdown("<h1 style='text-align: center;'>🧠 ICH Detection from MRI Scans</h1>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center; color: grey;'>Upload a clear MRI image and get an instant diagnosis</h4>", unsafe_allow_html=True)
+    st.markdown("---")
 
-    # File upload
-    img_file = st.file_uploader("📤 Upload an MRI Image", type=['jpg', 'jpeg', 'png'])
+    # === Upload Section ===
+    with st.container():
+        st.subheader("📤 Upload MRI Image:")
+        img_file = st.file_uploader("", type=['jpg', 'jpeg', 'png'])
 
-    if img_file is not None:
-        upload_dir = "./upload_image"
-        os.makedirs(upload_dir, exist_ok=True)
-        save_path = os.path.join(upload_dir, img_file.name)
+        if img_file:
+            upload_dir = "./upload_image"
+            os.makedirs(upload_dir, exist_ok=True)
+            save_path = os.path.join(upload_dir, img_file.name)
 
-        with open(save_path, "wb") as f:
-            f.write(img_file.getbuffer())
+            with open(save_path, "wb") as f:
+                f.write(img_file.getbuffer())
 
-        # Show image
-        st.image(Image.open(save_path), caption='🖼 Uploaded Image', use_column_width=True)
+            # Display image centered
+            st.markdown("#### 🖼 Uploaded Image:")
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                st.image(Image.open(save_path), width=300)
 
-        # Predict
-        result, confidence = processed_img(save_path)
-        if result in tuberculosis:
-            st.error("🚨 **ICH DETECTED!**")
-        else:
-            st.success("✅ **No ICH Detected.**")
+            # === Prediction ===
+            result, confidence = processed_img(save_path)
 
-        # Optional confidence display
-        if show_confidence == "Yes":
-            st.markdown(f"**Confidence**: `{confidence * 100:.2f}%`")
+            st.markdown("---")
+            st.markdown("### 🔍 **Prediction Result:**")
 
-        # Optional detailed info
-        if display_mode == "Detailed":
-            st.markdown("📚 *Model: Custom CNN with Attention*")
-            st.markdown("🧪 *Input shape: (128, 128, 3)*")
-            st.markdown("📊 *Model trained on annotated ICH dataset*")
+            if result in positive_class:
+                st.error("🚨 **ICH DETECTED!**")
+            else:
+                st.success("✅ **No ICH Detected.**")
 
+            # Confidence Score
+            if show_confidence == "Yes":
+                st.info(f"**Model Confidence**: `{confidence * 100:.2f}%`")
 # Run the app
 if __name__ == "__main__":
     run()
