@@ -40,7 +40,7 @@ def run():
         show_confidence = st.selectbox("📈 Show Confidence Score?", ["Yes", "No"])
         st.markdown("---")
         st.markdown("👨‍💻 **Developed by:** Akshwin T")
-        st.markdown("📬 [akshwint.2003@gmail.com](mailto:akshwint.2003@gmail.com)")
+        st.markdown("📬[akshwint.2003@gmail.com](mailto:akshwint.2003@gmail.com)")
 
     # === Title ===
     st.markdown("<h1 style='text-align: center; color: #4B8BBE;'>🧠 ICH Detection from MRI Scans</h1>", unsafe_allow_html=True)
@@ -75,7 +75,7 @@ def run():
         # === Image Preview ===
         st.markdown("### 🖼 Preview:")
         st.markdown(f"**🗂 File:** `{image_name}` | 📐 Size: `{image_info.size}` px")
-        st.image(image_info, width=300, caption="MRI Image", use_column_width=False)
+        st.image(image_info, width=300, caption="MRI Image", use_container_width=False)
 
         st.markdown("---")
 
