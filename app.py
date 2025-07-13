@@ -25,22 +25,41 @@ def processed_img(img_path):
 
 # Streamlit App
 def run():
-    st.set_page_config(page_title="ICH Detection", layout="centered")
+    st.set_page_config(page_title="ICH Detection", layout="centered",page_icon="🧠")
 
     # === Sidebar ===
     with st.sidebar:
-        st.markdown("## 🧾 **Project Overview**")
-        st.markdown("""
-        - 🤖 **Model**: CNN with Attention  
-        - 🧠 **Task**: Intracranial Hemorrhage Detection  
-        - 🎯 **Accuracy**: 92%  
-        - 📚 **Input**: MRI Scan Image
-        """)
-        st.selectbox("🔍 Display Mode", ["Basic", "Detailed"])
+        # Title and short description
+        st.title("🧠 ICH Detector")
+        st.markdown("This tool uses deep learning to detect intracranial hemorrhage (ICH) from MRI brain scans. Upload an image to get instant classification results.")
+
+        # Dropdown: Project Overview
+        with st.expander("📘 Project Overview", expanded=False):
+            st.markdown("""
+- Classifies MRI brain scans to detect **Intracranial Hemorrhage (ICH)**
+- Output: `ICH` or `No ICH`
+- Developed using deep learning (CNN + Attention)
+""")
+
+        # Dropdown: Model Details
+        with st.expander("🧪 Model Details", expanded=False):
+            st.markdown("""
+- 📐 **Architecture**: CNN with Attention  
+- 🎯 **Accuracy**: 92%  
+- 🖼️ **Input Size**: 128 × 128 × 3  
+- 💾 **Model Format**: `.h5`
+""")
+
+        # Always visible: Options
+        st.markdown("### ⚙️ Options")
+        st.selectbox("📺 Display Mode", ["Basic", "Detailed"])
         show_confidence = st.selectbox("📈 Show Confidence Score?", ["Yes", "No"])
-        st.markdown("---")
-        st.markdown("👨‍💻 **Developed by:** Akshwin T")
-        st.markdown("📬[akshwint.2003@gmail.com](mailto:akshwint.2003@gmail.com)")
+
+        # Developer info
+        st.markdown("### 👨‍💻 Developer Info")
+        st.markdown("""
+**Akshwin T**  
+📧 [akshwint.2003@gmail.com](mailto:akshwint.2003@gmail.com)  """)
 
     # === Title ===
     st.markdown("<h1 style='text-align: center; color: #4B8BBE;'>🧠 ICH Detection from MRI Scans</h1>", unsafe_allow_html=True)
@@ -58,7 +77,7 @@ def run():
         if use_sample:
             sample_path = "./upload_image/ich.png"
             if not os.path.exists(sample_path):
-                st.error("❌ Sample image not found. Please ensure 'ich.png' is in 'upload_image' folder.")
+                st.error("❌ Sample image not found. Please ensure 'ich.png' is in the 'upload_image' folder.")
                 return
             save_path = sample_path
             image_info = Image.open(sample_path)
@@ -75,7 +94,11 @@ def run():
         # === Image Preview ===
         st.markdown("### 🖼 Preview:")
         st.markdown(f"**🗂 File:** `{image_name}` | 📐 Size: `{image_info.size}` px")
-        st.image(image_info, width=300, caption="MRI Image", use_container_width=False)
+
+        # Center the image
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.image(image_info, caption="MRI Image", use_column_width=True)
 
         st.markdown("---")
 
@@ -87,12 +110,10 @@ def run():
         if result in positive_class:
             st.error("🚨 **ICH DETECTED!**", icon="⚠️")
         else:
-            st.success("**No ICH Detected.**", icon="✅")
+            st.success("✅ **No ICH Detected.**", icon="✅")
 
         if show_confidence == "Yes":
             st.info(f"📊 **Model Confidence**: `{confidence * 100:.2f}%`")
-
-        st.markdown("---")
 
 # Run the app
 if __name__ == "__main__":
