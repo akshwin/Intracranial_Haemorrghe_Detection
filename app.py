@@ -98,7 +98,7 @@ def run():
         # Center the image
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            st.image(image_info, caption="MRI Image", use_column_width=True)
+            st.image(image_info, caption="MRI Image", use_container_width=True)
 
         st.markdown("---")
 
