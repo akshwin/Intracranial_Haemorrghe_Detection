@@ -108,9 +108,9 @@ def run():
 
         st.markdown("### 🧪 **Prediction Result:**")
         if result in positive_class:
-            st.error("🚨 **ICH DETECTED!**", icon="⚠️")
+            st.error("**ICH DETECTED!**", icon="⚠️")
         else:
-            st.success("✅ **No ICH Detected.**", icon="✅")
+            st.success("**No ICH Detected.**", icon="✅")
 
         if show_confidence == "Yes":
             st.info(f"📊 **Model Confidence**: `{confidence * 100:.2f}%`")
