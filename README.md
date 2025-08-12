@@ -92,7 +92,9 @@ Make sure you have Python 3.x installed.
 # Step 1: Clone the repository
 git clone https://github.com/yourusername/ich-detector.git
 cd ich-detector
+````
 
+```bash
 # Step 2: (Optional) Create a virtual environment
 python -m venv venv
 # Activate:
@@ -101,9 +103,12 @@ venv\Scripts\activate
 # On macOS/Linux:
 source venv/bin/activate
 
+````
+```bash
 # Step 3: Install required packages
 pip install -r requirements.txt
-
+````
+```bash
 # Step 4: Run the Streamlit app
 streamlit run app.py
 ```
